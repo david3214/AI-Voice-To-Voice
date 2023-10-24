@@ -12,6 +12,8 @@ GPT_MODELS = {
 openai.api_key = OPENAI_KEY
 
 # Each instance of the chatbot contains a history of the conversation it has had
+
+
 class OpenAIChatbot:
     def __init__(self, model=GPT_MODELS["3"]):
         self.model = model
@@ -24,11 +26,10 @@ class OpenAIChatbot:
             model=self.model,
             messages=self.messages,
             temperature=0.1,
-            stream=True,
+            # stream=True,
         )
         self.messages.append({"role": "assistant", "content": response.choices[0].message["content"]})
         return response.choices[0].message["content"]
-
 
 
 if __name__ == '__main__':
