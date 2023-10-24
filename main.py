@@ -3,7 +3,7 @@ from elevel_labs import Voices, Models, TTS
 
 def main():
   chatbot = OpenAIChatbot()
-  tts = TTS(voice=Voices.ADAM, model=Models.ENGLISH)
+  tts = TTS('')
 
   while True:
     user_input = input('User: ')
