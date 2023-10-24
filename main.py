@@ -1,5 +1,18 @@
+from chatgpt import OpenAIChatbot
+from elevel_labs import Voices, Models, TTS
+
 def main():
-  pass
+  chatbot = OpenAIChatbot()
+  tts = TTS(voice=Voices.ADAM, model=Models.ENGLISH)
+
+  while True:
+    user_input = input('User: ')
+    if user_input == 'exit':
+      break
+    response = chatbot.get_completion(user_input)
+    tts.set_text(response)
+
+  
 
 
 if __name__ == '__main__':
