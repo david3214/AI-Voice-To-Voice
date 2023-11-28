@@ -1,0 +1,199 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #1E1E1E;
+    color: #FFFFFF;
+}
+
+.sidebar {
+    background-color: #2E2E2E;
+    width: 0; /* Start with sidebar closed */
+    height: 100%;
+    overflow: hidden;
+    transition: width 0.5s; /* Smooth transition for sidebar width */
+    position: fixed; /* Fixed or absolute, depending on your layout */
+    float: left;
+    padding-top: 50px;
+}
+
+.voice-selector {
+    padding: 20px;
+}
+
+.voice-button {
+    background-color: #2E2E2E;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px;
+    margin: 10px 0;
+    width: 100%;
+    text-align: left;
+}
+
+.voice-button:hover {
+    background-color: #333333;
+}
+
+.main-content {
+    margin-left: 75px;
+    padding: 20px;
+    transition: margin-left 0.5s; /* Smooth transition for content */
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px);
+}
+
+.chat-history{
+    flex-grow: 1;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #333;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: auto;
+}
+
+.text-input{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    background-color: #222;
+}
+
+.input-group {
+    display: flex;
+    flex-grow: 1;
+}
+
+#chat-input {
+    flex-grow: 1; /* Allow input to take up as much space as possible */
+    padding: 10px;
+    border: none;
+    border-right: none;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    outline: none;
+}
+
+.send-button {
+    padding: 10px 15px; /* Padding for the button */
+    background-color: #5E9ED6; /* Example button color */
+    border: none;
+    color: white; /* Text color */
+    border-top-right-radius: 4px; /* Rounded corner on the top right */
+    border-bottom-right-radius: 4px; /* Rounded corner on the bottom right */
+    cursor: pointer; /* Change cursor to indicate button */
+}
+
+.mic-icon {
+    background: none; /* No background for a cleaner look */
+    border: none; /* No border for a cleaner look */
+    font-size: 24px; /* Adjust size as needed */
+    cursor: pointer; /* Change cursor to pointer to indicate button */
+    color: #FFFFFF; /* Color to ensure visibility */
+    margin-right: 10px; /* Space between icon and text */
+}
+
+.voice-entry {
+    padding: 10px;
+}
+
+.secondary-text {
+    color: #CCCCCC;
+}
+
+.status-dots {
+    text-align: center;
+}
+
+.dot {
+    height: 20px;
+    width: 20px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 5px;
+}
+
+/* Hamburger Button Style */
+.hamburger-button {
+    display: block; /* Always show hamburger */
+    position: fixed; /* Fixed or absolute, depending on your layout */
+    top: 20px;
+    left: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #FFFFFF; /* Color to ensure visibility */
+    background-color: transparent;
+    z-index: 10; /* Ensure it's above other elements */
+}
+
+/* Add additional styles for active/inactive states as needed */
+.inactive {
+    display: none;
+}
+
+.chat-bubble {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 20px; /* Rounded corners for chat bubble */
+    color: white; /* White text */
+    display: inline-block;
+    max-width: 80%; /* Making sure it doesn't fill the entire width of the chat */
+    word-wrap: break-word; /* Break long words */
+}
+
+/* Styles for differentiating between user's messages and others' messages */
+.chat-bubble.user {
+    background-color: #6CA6CD; /* Different background color for user */
+    margin-left: auto; /* Align to right */
+    align-self: flex-end; /* Align to right */
+}
+
+.chat-bubble.other {
+    background-color: #4CAF50; /* Different background color for others */
+    color: white;
+    align-self: flex-start; /* Align to left */
+}
+
+/* Styling the scrollbar for chat history */
+.chat-history::-webkit-scrollbar {
+    width: 10px; /* Adjust the width of the scrollbar */
+}
+
+/* Handle */
+.chat-history::-webkit-scrollbar-thumb {
+    background: #9b9fa3; /* Scrollbar color */
+    border-radius: 5px; /* Rounded corners for the scrollbar */
+}
+
+/* Handle on hover */
+.chat-history::-webkit-scrollbar-thumb:hover {
+    background: #818487; /* Scrollbar color on hover */
+}
+
+/* Scrollbar Track */
+.chat-history::-webkit-scrollbar-track {
+    background: #333; /* Track color */
+    border-radius: 5px; /* Rounded corners for the track */
+}
+
+.dot {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 5px;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
+.listening-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
+.listening-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
+.listening-indicator .dot:nth-child(3) { animation-delay: 0; }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask App Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <button class="hamburger-button">&#9776;</button>
+    <div class="sidebar" id="sidebar">
+        <!-- Sidebar content here -->
+        <div class="voice-selector">
+            <button class="voice-button">Adam</button>
+            <button class="voice-button">Voice 2</button>
+            <button class="voice-button">Voice 3</button>
+            <button class="voice-button">Voice 4</button>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="chat-history" id="chat-history">
+
+        </div>
+        <div class="text-input">
+            <button class="mic-icon">&#127897;</button>
+            <div class="listening-indicator" id="listening-indicator" style="display: none;">
+                <span class="dot" style="background-color: #FF6961;"></span>
+                <span class="dot" style="background-color: #6CA6CD;"></span>
+                <span class="dot" style="background-color: #98FB98;"></span>
+            </div>
+            <div class="input-group" id="input-group">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Type your message here...">
+                <button class="send-button">&#10148;</button>
+            </div>
+            
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+</html>

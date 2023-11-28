@@ -1,5 +1,5 @@
 from chatgpt import OpenAIChatbot
-from elevel_labs import Voices, Models, TTS
+from eleven_labs import Voices, Models, TTS
 
 def main():
   chatbot = OpenAIChatbot()
@@ -10,7 +10,7 @@ def main():
     if user_input == 'exit':
       break
     response = chatbot.get_completion(user_input)
-    tts.set_text(response)
+    # tts.set_text(response)
 
   
 
