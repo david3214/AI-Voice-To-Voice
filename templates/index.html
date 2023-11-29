@@ -10,10 +10,13 @@
     <div class="sidebar" id="sidebar">
         <!-- Sidebar content here -->
         <div class="voice-selector">
-            <button class="voice-button">Adam</button>
-            <button class="voice-button">Voice 2</button>
-            <button class="voice-button">Voice 3</button>
-            <button class="voice-button">Voice 4</button>
+            <div class="voice-list">
+                <ul>
+                    {% for voice in voices %}
+                        <li><button class="voice-button" data-voice="{{voice}}">{{voice}}</button></li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
     <div class="main-content">

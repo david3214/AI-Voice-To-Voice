@@ -10,12 +10,14 @@ elevenlabs.set_api_key(getenv('ELEVEN_LABS_API_KEY'))
 
 class Models(Enum):
     '''List of available models'''
+
     MULTILINGUAL = 'eleven_multilingual_v2'
     ENGLISH = 'eleven_monolingual_v1'
 
 
 class Voices(Enum):
     '''List of american accent voice names'''
+
     # Only the american accents are listed here
     RACHEL = 'Rachel'
     CLYDE = 'Clyde'
@@ -48,7 +50,9 @@ class Voices(Enum):
 class TTS:
     '''Text to speech class for Eleven Labs API'''
 
-    def __init__(self, text: str = None, text_steam: Generator = None, voice: Voices = Voices.ADAM, model: Models = Models.ENGLISH, stream: bool = True) -> None:
+    def __init__(
+        self, text: str = None, text_steam: Generator = None, voice: Voices = Voices.ADAM, model: Models = Models.ENGLISH, stream: bool = True
+    ) -> None:
         if text is None and text_steam is None:
             raise ValueError('text or text_stream must be set')
         elif text is not None and text_steam is not None:
