@@ -14,25 +14,48 @@ body, html {
     transition: width 0.5s; /* Smooth transition for sidebar width */
     position: fixed; /* Fixed or absolute, depending on your layout */
     float: left;
-    padding-top: 50px;
+    padding-top: 75px;
 }
 
 .voice-selector {
-    padding: 20px;
+    overflow-y: auto;
+    padding-left: 10px;
 }
 
 .voice-button {
     background-color: #2E2E2E;
     color: #FFFFFF;
-    border: none;
+    border: 1px solid #1E1E1E;
     padding: 10px;
-    margin: 10px 0;
     width: 100%;
     text-align: left;
 }
 
 .voice-button:hover {
     background-color: #333333;
+}
+
+.voice-list ul {
+    list-style-type: none;
+    padding: 0;
+    max-height: calc(100vh - 75px);
+    overflow-y: scroll;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: transparent transparent; /* Firefox */
+}
+
+.voice-list ul::-webkit-scrollbar {
+    width: 0.5em; /* Width of the scrollbar */
+}
+
+.voice-list ul::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Color of the scrollbar thumb */
+}
+
+.voice-button.active {
+    background-color: #333333; /* Change to the desired background color for the active state */
+    color: #FFFFFF; /* Change to the desired text color for the active state */
+    border: 2px solid #FFFFFF; /* Add a border to highlight the active button */
 }
 
 .main-content {

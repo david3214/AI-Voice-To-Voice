@@ -99,3 +99,41 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Change Voice
+document.addEventListener('DOMContentLoaded', function() {
+    const voiceButtons = document.querySelectorAll('.voice-button');
+
+    voiceButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const selectedVoice = button.dataset.voice;
+
+            // Remove the 'active' class from all buttons
+            voiceButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add the 'active' class to the clicked button
+            button.classList.add('active');
+
+            updateVoice(selectedVoice);
+        });
+    });
+
+    function updateVoice(voice) {
+        // Send the selected voice to the server
+        fetch('/update_voice', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ voice: voice }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message); // Log the response message
+        })
+        .catch(error => {
+            console.error('Error updating voice:', error);
+        });
+    }
+});
