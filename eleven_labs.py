@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from os import getenv
 from enum import Enum
 from typing import Generator
+from datetime import datetime
 
 load_dotenv()
 elevenlabs.set_api_key(getenv('ELEVEN_LABS_API_KEY'))
@@ -70,6 +71,21 @@ class TTS:
         else:
             audio_stream = elevenlabs.generate(text=self.text_stream(), voice=self.voice, model=self.model, stream=self.stream)
         elevenlabs.stream(audio_stream)
+
+    def save_audio(self) -> str:
+        '''Saves the audio stream to a file and returns the file path'''
+        filename = f'static/output_{datetime.now().strftime("%Y%m%d%H%M%S")}_{uuid.uuid4()}.mp3'
+
+        if self.text is not None:
+            audio_stream = elevenlabs.generate(text=self.text, voice=self.voice, model=self.model, stream=self.stream)
+        else:
+            audio_stream = elevenlabs.generate(text=self.text_stream(), voice=self.voice, model=self.model, stream=self.stream)
+        
+        # Assuming audio_stream can be written directly to a file
+        with open(filename, 'wb') as file:
+            file.write(audio_stream.read())
+
+        return filename
 
     def set_text(self, text: str) -> None:
         '''Sets the text to be played'''
