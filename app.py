@@ -1,13 +1,15 @@
 from flask import Flask, render_template, request, jsonify, url_for
 from chatgpt import OpenAIChatbot
 from eleven_labs import Voices, Models, TTS
-import os
+from voice_to_text import SpeechToText
+from clear_recordings import clear_old_audio
 
 app = Flask(__name__)
 
 chatbot = OpenAIChatbot()
 tts = TTS('')
 
+clear_old_audio()
 
 @app.route('/')
 def index():
@@ -18,15 +20,15 @@ def index():
 def send_message():
     message = request.json.get('message')
     print(message)
-    # Process the message here (e.g., save to database, perform an action, etc.)
-    # response_message = chatbot.get_completion(message)
-    response_message = "This is a response message"
-    # tts.set_text(response_message)
-    # filename = tts.save_audio()
+    
+    response_message = chatbot.get_completion(message)
+    tts.set_text(response_message)
+    filename = tts.save_audio() 
 
-    filename = "audio.mp3"
-    audio_url = url_for('static', filename=filename)  # Generate URL
-    print(audio_url)
+    # Generate URL for the saved audio
+    audio_url = url_for('static', filename=filename, _external=True)  # Generate absolute URL
+
+    # response_message = 'Your audio has been processed'
     return jsonify({'audioUrl': audio_url, 'responseMessage': response_message})
 
 
@@ -38,51 +40,27 @@ def update_voice():
     return jsonify({"message": f"Voice updated to {selected_voice}"})
 
 
-# @app.route('/process_audio', methods=['POST'])
-# def process_audio():
-#     audio_file = request.files['audio']
-#     # Process the audio file as needed
-#     # TODO: implement the Speech to text here
-
-#     sent_text = "You said Someting"; # audio to text
-#     # response_message = chatbot.get_completion(text)
-#     response_message = "This is a response message"
-#     # tts.set_text(response_message)
-#     # filename = tts.save_audio()
-
-#     filename = "sent_audio.mp3"
-#     if audio_file.filename != '':
-#         print('Saving file to static folder')
-#         audio_file.save(filename)
-
-#     filename = 'audio.mp3'
-#     audio_url = url_for('static', filename=filename)  # Generate URL
-#     return jsonify({'audioUrl': audio_url, 'sentText': sent_text, 'responseMessage': response_message})
-
-
 @app.route('/process_audio', methods=['POST'])
 def process_audio():
     # Receive and save the audio file
     audio_file = request.files['audio']
     # Process the audio file as needed
-    # TODO: implement the Speechto text here
 
-    sent_text = "You said Someting"; # audio to text
-    # response_message = chatbot.get_completion(text)
-    response_message = "This is a response message"
-    # tts.set_text(response_message)
-    # filename = tts.save_audio() 
+    # Convert audio to wav
+    stt = SpeechToText(audio_file)
+    user_text = stt.get_text()
+    print(user_text)
+    
 
-    # TODO: Remove this section and replace with tts audio
-    filename = audio_file.filename
-    save_path = os.path.join('static', filename)  # Assuming you have a 'static' folder
-    audio_file.save(save_path)
+    response_message = chatbot.get_completion(user_text)
+    tts.set_text(response_message)
+    filename = tts.save_audio() 
 
     # Generate URL for the saved audio
     audio_url = url_for('static', filename=filename, _external=True)  # Generate absolute URL
 
-    response_message = 'Your audio has been processed'
-    return jsonify({'audioUrl': audio_url, 'responseMessage': response_message, 'sentText': 'You said something'})
+    # response_message = 'Your audio has been processed'
+    return jsonify({'audioUrl': audio_url, 'responseMessage': response_message, 'sentText': user_text})
 
 
 if __name__ == '__main__':

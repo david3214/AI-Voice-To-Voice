@@ -4,6 +4,7 @@ from os import getenv
 from enum import Enum
 from typing import Generator
 from datetime import datetime
+import os
 
 load_dotenv()
 elevenlabs.set_api_key(getenv('ELEVEN_LABS_API_KEY'))
@@ -52,7 +53,7 @@ class TTS:
     '''Text to speech class for Eleven Labs API'''
 
     def __init__(
-        self, text: str = None, text_steam: Generator = None, voice: Voices = Voices.ADAM, model: Models = Models.ENGLISH, stream: bool = True
+        self, text: str = None, text_steam: Generator = None, voice: Voices = Voices.ADAM, model: Models = Models.ENGLISH, stream: bool = False
     ) -> None:
         if text is None and text_steam is None:
             raise ValueError('text or text_stream must be set')
@@ -74,16 +75,15 @@ class TTS:
 
     def save_audio(self) -> str:
         '''Saves the audio stream to a file and returns the file path'''
-        filename = f'static/output_{datetime.now().strftime("%Y%m%d%H%M%S")}_{uuid.uuid4()}.mp3'
+        filename = f'output_{datetime.now().strftime("%Y%m%d%H%M%S")}.wav'
+        save_path = os.path.join('static', filename)
 
         if self.text is not None:
             audio_stream = elevenlabs.generate(text=self.text, voice=self.voice, model=self.model, stream=self.stream)
         else:
             audio_stream = elevenlabs.generate(text=self.text_stream(), voice=self.voice, model=self.model, stream=self.stream)
-        
-        # Assuming audio_stream can be written directly to a file
-        with open(filename, 'wb') as file:
-            file.write(audio_stream.read())
+
+        elevenlabs.save(audio_stream, save_path)
 
         return filename
 

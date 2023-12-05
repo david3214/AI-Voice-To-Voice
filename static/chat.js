@@ -22,12 +22,16 @@ function startRecording() {
 }
 
 function handleRecordingStop() {
+    ToggleWaitingForResponse();
     // Convert audio chunks to a single audio Blob
     const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
     const audioUrl = URL.createObjectURL(audioBlob);
 
+    audioChunks = []; // Reset the audio chunks array
+
     const formData = new FormData();
-    formData.append('audio', audioBlob, 'recording.mp3');
+    filename = `recording-${Date.now()}.mp3`
+    formData.append('audio', audioBlob, filename);
 
     fetch('/process_audio', {
         method: 'POST',
@@ -52,9 +56,11 @@ function handleRecordingStop() {
             playButton = handleAudioUrl(data.audioUrl);
             togglePlayStop(data.audioUrl, playButton);
         }
+        ToggleWaitingForResponse();
     })
     .catch(error => {
         console.error('Error:', error);
+        ToggleWaitingForResponse();
     });
 }
 
@@ -139,6 +145,7 @@ function addChatBubble(message, user) {
 }
 
 function sendMessageToServer(message) {
+    ToggleWaitingForResponse();
     fetch('/send_message', {
         method: 'POST',
         headers: {
@@ -151,9 +158,19 @@ function sendMessageToServer(message) {
         console.log('Success:', data);
         if (data.responseMessage)
             addChatBubble(data.responseMessage, false); // false indicating it's not the user's message
+        
+        if (data.audioUrl) {
+            // const audioPlayer = document.getElementById('audio-playback');
+            // audioPlayer.src = data.audioUrl;
+            // audioPlayer.play();
+            playButton = handleAudioUrl(data.audioUrl);
+            togglePlayStop(data.audioUrl, playButton);
+        }
+        ToggleWaitingForResponse();
     })
     .catch((error) => {
         console.error('Error:', error);
+        ToggleWaitingForResponse();
     });
 }
 
@@ -288,3 +305,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function ToggleWaitingForResponse(){
+    let responseIndicator = document.getElementById('response-indicator');
+    if (responseIndicator.style.display === 'none') {
+        responseIndicator.style.display = 'flex';
+    } else {
+        responseIndicator.style.display = 'none';
+    }
+}
