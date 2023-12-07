@@ -162,7 +162,8 @@ body, html {
     margin: 10px;
     padding: 10px;
     border-radius: 20px; /* Rounded corners for chat bubble */
-    color: white; /* White text */
+    /* color: white; White text */
+    position: relative; /* Needed for play button */
     display: inline-block;
     max-width: 80%; /* Making sure it doesn't fill the entire width of the chat */
     word-wrap: break-word; /* Break long words */
@@ -217,6 +218,33 @@ body, html {
     40% { transform: scale(1.0); }
 }
 
+.play-audio {
+    cursor: pointer;
+    position: absolute;
+    top: -10px;
+    font-size: 16px;
+    color: white;
+    background: transparent;
+    border: none;
+}
+
+.play-audio.user {
+    left: -15px;
+}
+
+.play-audio.other {
+    right: -17px;
+}
+
+.response-indicator {
+    position: fixed;
+    bottom: 95px;
+}
+
 .listening-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
 .listening-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
 .listening-indicator .dot:nth-child(3) { animation-delay: 0; }
+
+.response-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
+.response-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
+.response-indicator .dot:nth-child(3) { animation-delay: 0; }

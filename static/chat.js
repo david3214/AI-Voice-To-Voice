@@ -1,3 +1,129 @@
+let uniqueCounter = 0;
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+let audioStream;
+
+function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            isRecording = true;
+            audioStream = stream; // Store the stream to stop it later
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+            mediaRecorder.onstop = handleRecordingStop;
+            mediaRecorder.start();
+        })
+        .catch(error => {
+            console.error("Error accessing the microphone", error);
+        });
+}
+
+function handleRecordingStop() {
+    ToggleWaitingForResponse();
+    // Convert audio chunks to a single audio Blob
+    const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    audioChunks = []; // Reset the audio chunks array
+
+    const formData = new FormData();
+    filename = `recording-${Date.now()}.mp3`
+    formData.append('audio', audioBlob, filename);
+
+    fetch('/process_audio', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        if (data.sentText){
+            addChatBubble(data.sentText, true); // true indicating it's the user's message
+            handleAudioUrl(audioUrl); // Call the function to handle the recorded audio URL
+        }
+
+        if (data.responseMessage) {
+            addChatBubble(data.responseMessage, false); // false indicating it's not the user's message
+        }
+
+        if (data.audioUrl) {
+            // const audioPlayer = document.getElementById('audio-playback');
+            // audioPlayer.src = data.audioUrl;
+            // audioPlayer.play();
+            playButton = handleAudioUrl(data.audioUrl);
+            togglePlayStop(data.audioUrl, playButton);
+        }
+        ToggleWaitingForResponse();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        ToggleWaitingForResponse();
+    });
+}
+
+function stopRecording() {
+    isRecording = false;
+    mediaRecorder.stop(); // Stop the media recorder
+    audioStream.getTracks().forEach(track => track.stop()); // Stop the media stream
+}
+
+// Event handler for the microphone icon
+document.querySelector('.mic-icon').addEventListener('click', () => {
+    if (!isRecording) {
+        startRecording();
+    } else {
+        stopRecording();
+    }
+});
+
+
+function togglePlayStop(audioUrl, playButton) {
+    const audioPlayer = document.getElementById('audio-playback');
+    if (audioPlayer.src !== audioUrl) {
+        // If a new audio, change the source
+        audioPlayer.src = audioUrl;
+    }
+    console.log('audioPlayer.paused: ' + audioPlayer.paused)
+    if (audioPlayer.paused) {
+        console.log('Playing: ' + playButton)
+        audioPlayer.play();
+        playButton.textContent = '■'; // Unicode for the stop square
+        audioPlayer.setAttribute('data-playing-button-id', playButton.id);
+    } else {
+        console.log('Pausing: ' + playButton)
+        audioPlayer.pause();
+        playButton.textContent = '▶️'; // Unicode for the right-pointing triangle
+        
+        audioPlayer.removeAttribute('data-playing-button-id');
+    }
+}
+
+
+function handleAudioUrl(audioUrl) {
+    // Example: Attach the audio URL to the last sent message
+    let firstMessage = document.querySelector('.chat-history').firstChild;
+    let playButton;
+    // if firstmessage is a #text node, get the next sibling
+    if (firstMessage.nodeType === Node.TEXT_NODE) 
+        firstMessage = firstMessage.nextSibling;
+    if (firstMessage) {
+        console.log(firstMessage)
+        playButton = firstMessage.querySelector('.play-audio');
+        user = firstMessage.classList.contains('user');
+        userText = user ? ' user' : ' other';
+        if (!playButton)
+            playButton = document.createElement('button');
+            playButton.className = 'play-audio' + userText;
+            playButton.textContent = '▶️';
+            playButton.id = 'play-button-' + uniqueCounter++;
+            firstMessage.appendChild(playButton);
+        playButton.onclick = () => togglePlayStop(audioUrl, playButton);
+    }
+    return playButton;
+}
 
 function addChatBubble(message, user) {
     var chatHistory = document.getElementById('chat-history');
@@ -19,6 +145,7 @@ function addChatBubble(message, user) {
 }
 
 function sendMessageToServer(message) {
+    ToggleWaitingForResponse();
     fetch('/send_message', {
         method: 'POST',
         headers: {
@@ -29,12 +156,48 @@ function sendMessageToServer(message) {
     .then(response => response.json())
     .then(data => {
         console.log('Success:', data);
-        addChatBubble(data.message, false); // false indicating it's not the user's message
+        if (data.responseMessage)
+            addChatBubble(data.responseMessage, false); // false indicating it's not the user's message
+        
+        if (data.audioUrl) {
+            // const audioPlayer = document.getElementById('audio-playback');
+            // audioPlayer.src = data.audioUrl;
+            // audioPlayer.play();
+            playButton = handleAudioUrl(data.audioUrl);
+            togglePlayStop(data.audioUrl, playButton);
+        }
+        ToggleWaitingForResponse();
     })
     .catch((error) => {
         console.error('Error:', error);
+        ToggleWaitingForResponse();
     });
 }
+
+// End of audio events
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the audio element
+    const audioPlayer = document.getElementById('audio-playback');
+
+    // Set up the event listener for when audio ends
+    audioPlayer.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.pause();
+        // Get the ID of the playing button from the data attribute
+        const playingButtonId = this.getAttribute('data-playing-button-id');
+        if (playingButtonId) {
+            // Find the button by ID and reset its text content
+            const playingButton = document.getElementById(playingButtonId);
+            if (playingButton) {
+                playingButton.textContent = '▶️';
+            }
+        }
+
+        // Clear the attribute since the audio has ended
+        this.removeAttribute('data-playing-button-id');
+    });
+});
+
 
 // Chat bubble creation
 document.addEventListener('DOMContentLoaded', function() {
@@ -95,7 +258,12 @@ document.addEventListener('DOMContentLoaded', function() {
             listeningIndicator.style.display = 'flex';
         }
 
-        // Here you can add actual voice recognition functionality
+    });
+
+    var audioPlayer = document.getElementById('audio-playback');
+
+    audioPlayer.addEventListener('error', (e) => {
+        console.error('Error loading audio:', e);
     });
 });
 
@@ -137,3 +305,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function ToggleWaitingForResponse(){
+    let responseIndicator = document.getElementById('response-indicator');
+    if (responseIndicator.style.display === 'none') {
+        responseIndicator.style.display = 'flex';
+    } else {
+        responseIndicator.style.display = 'none';
+    }
+}
